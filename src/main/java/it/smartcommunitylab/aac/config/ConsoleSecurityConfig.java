@@ -1,5 +1,7 @@
 package it.smartcommunitylab.aac.config;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,6 +9,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import it.smartcommunitylab.aac.core.auth.Http401UnauthorizedEntryPoint;
 
@@ -36,6 +41,10 @@ public class ConsoleSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(new Http401UnauthorizedEntryPoint())
                 .accessDeniedPage("/accesserror")
                 .and()
+                // allow cors
+                .cors().configurationSource(corsConfigurationSource())
+                .and()
+                // disable crsf for spa console
                 .csrf()
                 .disable()
                 // we want a session for console
@@ -46,6 +55,17 @@ public class ConsoleSecurityConfig extends WebSecurityConfigurerAdapter {
     public RequestMatcher getRequestMatcher() {
         return new AntPathRequestMatcher(CONSOLE_PREFIX + "/**");
 
+    }
+
+    private CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOriginPatterns(Arrays.asList("http://localhost:*"));
+        config.setAllowedMethods(Arrays.asList("GET"));
+        config.setAllowedHeaders(Arrays.asList("authorization", "range"));
+        config.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     public static final String CONSOLE_PREFIX = "/console";
