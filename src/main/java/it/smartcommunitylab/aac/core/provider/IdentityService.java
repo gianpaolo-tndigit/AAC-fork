@@ -30,11 +30,11 @@ public interface IdentityService<I extends UserIdentity, U extends UserAccount>
      */
 
     public I registerIdentity(
-            String userId, U account,
+            String userId, UserAccount account,
             Collection<UserAttributes> attributes) throws NoSuchUserException, RegistrationException;
 
     public I updateIdentity(
-            String identityId, U account,
+            String identityId, UserAccount account,
             Collection<UserAttributes> attributes) throws NoSuchUserException, RegistrationException;
 
     /*

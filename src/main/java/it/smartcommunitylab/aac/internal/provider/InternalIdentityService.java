@@ -18,6 +18,7 @@ import it.smartcommunitylab.aac.common.NoSuchUserException;
 import it.smartcommunitylab.aac.common.RegistrationException;
 import it.smartcommunitylab.aac.core.base.AbstractProvider;
 import it.smartcommunitylab.aac.core.entrypoint.RealmAwareUriBuilder;
+import it.smartcommunitylab.aac.core.model.UserAccount;
 import it.smartcommunitylab.aac.core.model.UserAttributes;
 import it.smartcommunitylab.aac.core.model.UserAuthenticatedPrincipal;
 import it.smartcommunitylab.aac.core.persistence.UserEntity;
@@ -339,12 +340,17 @@ public class InternalIdentityService extends AbstractProvider
     @Override
     @Transactional(readOnly = false)
     public InternalUserIdentity registerIdentity(
-            String userId, InternalUserAccount reg,
+            String userId, UserAccount registration,
             Collection<UserAttributes> attributes)
             throws NoSuchUserException, RegistrationException {
         if (!config.isEnableRegistration()) {
             throw new IllegalArgumentException("registration is disabled for this provider");
         }
+
+        Assert.isInstanceOf(InternalUserAccount.class, registration,
+                "account must be an instance of internal account");
+
+        InternalUserAccount reg = (InternalUserAccount) registration;
 
         if (reg == null) {
             throw new RegistrationException("empty or incomplete registration");
@@ -404,12 +410,17 @@ public class InternalIdentityService extends AbstractProvider
     @Override
     @Transactional(readOnly = false)
     public InternalUserIdentity updateIdentity(
-            String username, InternalUserAccount reg,
+            String username, UserAccount registration,
             Collection<UserAttributes> attributes)
             throws NoSuchUserException, RegistrationException {
         if (!config.isEnableUpdate()) {
             throw new IllegalArgumentException("update is disabled for this provider");
         }
+
+        Assert.isInstanceOf(InternalUserAccount.class, registration,
+                "account must be an instance of internal account");
+
+        InternalUserAccount reg = (InternalUserAccount) registration;
 
         if (reg == null) {
             throw new RegistrationException("empty or incomplete registration");
